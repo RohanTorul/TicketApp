@@ -14,6 +14,7 @@ namespace TicketApp
         private string EmailOfIssuer;
         private DateTime DateTimeTicketCreated;
         private DateTime DateTimeTicketClosed;
+        public bool Creation_Success;
         private enum STATUS
         {
             ACTIVE = 0,
@@ -21,7 +22,7 @@ namespace TicketApp
             CLOSED = 2
         }
         private STATUS status;
-        private Boolean validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
+        public Boolean validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
         {   
 
             return true;//To be implemented...
@@ -37,7 +38,11 @@ namespace TicketApp
                 DateTimeTicketCreated = DateTime.Now; //most likely this must not have to be modified, a setter will be implemented anyways
                 DateTimeTicketClosed = DateTime.MinValue;//Must be a known nonesense value by default : 00:00:00.0000000
                 status = STATUS.PENDING; //A ticket is created as Pending by default
-
+                Creation_Success = true;
+            }
+            else
+            {
+                Creation_Success = false;
             }
 
         }
@@ -45,7 +50,7 @@ namespace TicketApp
           Setters and Getters for private attibutes.
          
          */
-        //-------------------------------------------------------------------------------------[TicketCode
+        //---------------------------------------------------------------------------------------[TicketCode
         public int setTicketCode(string NewTicketCode)
         {
             TicketCode = NewTicketCode;
@@ -65,7 +70,7 @@ namespace TicketApp
         {
             return (TicketDescription);
         }
-        //----------------------------------------------------------------------------------------[EmailOfIssuer
+        //---------------------------------------------------------------------------------------[EmailOfIssuer
         public int setEmailOfIssuer(string NewEmailOfIssuer)
         {
             EmailOfIssuer = NewEmailOfIssuer;
@@ -75,7 +80,7 @@ namespace TicketApp
         {
             return (EmailOfIssuer);
         }
-        //----------------------------------------------------------------------------------------[status
+        //---------------------------------------------------------------------------------------[status
         public int setStatus(int NewStatus)
         {
             status = (STATUS)NewStatus;
@@ -85,7 +90,7 @@ namespace TicketApp
         {
             return status.ToString();
         }
-        //----------------------------------------------------------------------------------------[DateTimeTicketCreated
+        //---------------------------------------------------------------------------------------[DateTimeTicketCreated
         public int setDateTimeTicketCreated(DateTime NewDateTimeTicketCreated)//just in case...
         {
             DateTimeTicketCreated = NewDateTimeTicketCreated;
@@ -104,11 +109,11 @@ namespace TicketApp
 
    public class TicketManager
     {   
-        public struct PendingQueue
+        private struct PendingQueue
         {
-            Queue<Ticket> HighImportance_PendingTicketRequests;
-            Queue<Ticket> NormalImportance_PendingTicketRequests;
-            Queue<Ticket> BelowNormalImportance_PendingTicketRequests;
+            public Queue<Ticket> HighImportance_PendingTicketRequests;
+            public Queue<Ticket> NormalImportance_PendingTicketRequests;
+            public Queue<Ticket> BelowNormalImportance_PendingTicketRequests;
             public PendingQueue()
             {
                 HighImportance_PendingTicketRequests = new Queue<Ticket>();
@@ -116,17 +121,20 @@ namespace TicketApp
                 BelowNormalImportance_PendingTicketRequests = new Queue<Ticket>();
             }
         }
-        private PendingQueue PendingRequests;//stores tickets that are yet to be acknowledged, in chronological order classified by importance....
+        private PendingQueue PendingRequests = new PendingQueue();//stores tickets that are yet to be acknowledged, in chronological order classified by importance....
         private Dictionary<string, Ticket> ActiveTickets = new Dictionary<string, Ticket>();//----------------------------------------------------------------------------------------------------┯--->Each ticket must be accessed randomly, and not by going though the whole list and getting access to all tickets.
         private Dictionary<string, Ticket> TicketsToBeClosed = new Dictionary<string, Ticket>();//Reasoning for this Dictionary is that before closing a ticket, it might have to be reviewed|----┙
 
+        
+        
+        /* replaced by public function in Ticket Class
         private bool validateTicket(Ticket ticket)//returns True if validation successfull
         {
-            /*To be Implemented*/
             return true;
-        }
+        }*/
 
-        /* Tentative Implementation
+
+        /* Tentative Implementation...most likely will be replaced
         public int newTicketHandler(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
         {
             Ticket TempTicket = new Ticket(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter);
@@ -142,7 +150,43 @@ namespace TicketApp
         }
         */
 
+        public int addPendingTickets(int ImportanceLevel, string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)// could use one function for each importance level, but it would lead to too much simmilar code
+        {
+            /*
+             Importance Levels: 1- High
+                                2- Normal
+                                3- BelowNormal
+             */
+            Ticket TempTicket = new Ticket(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter);
+            if (TempTicket.Creation_Success)
+            {
+                switch (ImportanceLevel)
+                {
+                    case 1:
+                        PendingRequests.HighImportance_PendingTicketRequests.Enqueue(TempTicket);
+                    return 0;
+                    case 2:
+                        PendingRequests.NormalImportance_PendingTicketRequests.Enqueue(TempTicket);
+                        return 0;
+                    case 3:
+                        PendingRequests.BelowNormalImportance_PendingTicketRequests.Enqueue(TempTicket);
+                        return 0;
+                    default:
+                        return -1;
 
+                }
+            }
+            else
+            {
+                return -1;
+            }
+            
+        }
+
+        public int assignPendingTicket(int ImportanceLevel, int amount = 0)// an amount of 0 means that the whole queue will be emptied and added to the Active Section
+        {
+            return 0;
+        }
 
     }
 }
