@@ -9,27 +9,32 @@ namespace TicketApp
 {
     internal class Ticket
     {
-        private string TicketCode;
-        private string TicketDescription;
+        private string TicketCode; // Unique Identifier
+        private string TicketDescription; // parsed mail contents
         private string EmailOfIssuer;
         private DateTime DateTimeTicketCreated;
         private DateTime DateTimeTicketClosed;
-        public bool Creation_Success;
+        private bool Creation_Success; // To check if the ticket constructor has been succesful.
         private enum STATUS
         {
             ACTIVE = 0,
             PENDING = 1,
             CLOSED = 2
         }
+        private enum TICKET_TYPE
+        {
+            // To be Implemented...
+        }
+
         private STATUS status;
         public Boolean validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
-        {   
+        {
 
             return true;//To be implemented...
         }
 
         public Ticket(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
-        {   
+        {
             if (validator(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter))
             {
                 TicketCode = TicketCode_Parameter;//-----------------┒
@@ -100,6 +105,22 @@ namespace TicketApp
         {
             return DateTimeTicketCreated.ToString();
         }
+        //---------------------------------------------------------------------------------------[DateTimeTicketCreated
+        public int setDateTimeTicketClosed(DateTime NewDateTimeTicketClosed)//just in case...
+        {
+            DateTimeTicketClosed = NewDateTimeTicketClosed;
+            return 0;
+        }
+        public string getDateTimeTicketClosed()
+        {
+            return DateTimeTicketClosed.ToString();
+        }
+        //---------------------------------------------------------------------------------------[Creation_Success
+        public bool getCreation_Success()
+        {
+            return Creation_Success;
+        }
+
     }
 
     internal class EmlFileParser
@@ -107,8 +128,8 @@ namespace TicketApp
 
     }
 
-   public class TicketManager
-    {   
+    public class TicketManager
+    {
         private struct PendingQueue
         {
             public Queue<Ticket> HighImportance_PendingTicketRequests;
@@ -125,8 +146,8 @@ namespace TicketApp
         private Dictionary<string, Ticket> ActiveTickets = new Dictionary<string, Ticket>();//----------------------------------------------------------------------------------------------------┯--->Each ticket must be accessed randomly, and not by going though the whole list and getting access to all tickets.
         private Dictionary<string, Ticket> TicketsToBeClosed = new Dictionary<string, Ticket>();//Reasoning for this Dictionary is that before closing a ticket, it might have to be reviewed|----┙
 
-        
-        
+
+
         /* replaced by public function in Ticket Class
         private bool validateTicket(Ticket ticket)//returns True if validation successfull
         {
@@ -158,13 +179,13 @@ namespace TicketApp
                                 3- BelowNormal
              */
             Ticket TempTicket = new Ticket(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter);
-            if (TempTicket.Creation_Success)
+            if (TempTicket.getCreation_Success())
             {
                 switch (ImportanceLevel)
                 {
                     case 1:
                         PendingRequests.HighImportance_PendingTicketRequests.Enqueue(TempTicket);
-                    return 0;
+                        return 0;
                     case 2:
                         PendingRequests.NormalImportance_PendingTicketRequests.Enqueue(TempTicket);
                         return 0;
@@ -180,11 +201,41 @@ namespace TicketApp
             {
                 return -1;
             }
-            
+
         }
 
-        public int assignPendingTicket(int ImportanceLevel, int amount = 0)// an amount of 0 means that the whole queue will be emptied and added to the Active Section
+        public int assignPendingTicket(int ImportanceLevel = 1/*High*/, int amount = 0)// an amount of 0 means that the whole queue will be emptied and added to ActiveTickets | an importance level of 0 means that all Importance levels have to be added to ActiveTicketes
         {
+            Ticket TempTicket;
+            if (amount == 0)
+            {
+                if (ImportanceLevel == 0)
+                {
+                    amount = PendingRequests.HighImportance_PendingTicketRequests.Count();
+                    for(int i = 0; i < amount; i++)
+                    {
+                        TempTicket = PendingRequests.HighImportance_PendingTicketRequests.Dequeue();
+                        ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                    }
+
+                    amount = PendingRequests.NormalImportance_PendingTicketRequests.Count();
+                    for (int i = 0; i < amount; i++)
+                    {
+                        TempTicket = PendingRequests.NormalImportance_PendingTicketRequests.Dequeue();
+                        ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                    }
+
+                    amount = PendingRequests.HighImportance_PendingTicketRequests.Count();
+                    for (int i = 0; i < amount; i++)
+                    {
+                        TempTicket = PendingRequests.HighImportance_PendingTicketRequests.Dequeue();
+                        ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                    }
+
+                    return 0;
+                }
+
+            }
             return 0;
         }
 
