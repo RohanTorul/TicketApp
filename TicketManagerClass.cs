@@ -97,14 +97,30 @@ namespace TicketApp
         }
     }
 
-   public class TicketManager
+    internal class EmlFileParser
     {
-        private Ticket ticket1;
-        private Queue<Ticket> PendingTicketRequests = new Queue<Ticket>();
-        private Dictionary<string, Ticket> ActiveTickets = new Dictionary<string, Ticket>();//--------------------------------------------------------------------------------┯--->Each ticket must be accessed randomly, and not by going though the whole list and getting access to all tickets.
-        private Dictionary<string, Ticket> TicketsToBeClosed = new Dictionary<string, Ticket>();//Reasoning is that before closing a ticket, it might have to be reviewed|----┙
 
-        private bool validateTicket(Ticket ticket)//returns True is validation successfull
+    }
+
+   public class TicketManager
+    {   
+        public struct PendingQueue
+        {
+            Queue<Ticket> HighImportance_PendingTicketRequests;
+            Queue<Ticket> NormalImportance_PendingTicketRequests;
+            Queue<Ticket> BelowNormalImportance_PendingTicketRequests;
+            public PendingQueue()
+            {
+                HighImportance_PendingTicketRequests = new Queue<Ticket>();
+                NormalImportance_PendingTicketRequests = new Queue<Ticket>();
+                BelowNormalImportance_PendingTicketRequests = new Queue<Ticket>();
+            }
+        }
+        private PendingQueue PendingRequests;//stores tickets that are yet to be acknowledged, in chronological order classified by importance....
+        private Dictionary<string, Ticket> ActiveTickets = new Dictionary<string, Ticket>();//----------------------------------------------------------------------------------------------------┯--->Each ticket must be accessed randomly, and not by going though the whole list and getting access to all tickets.
+        private Dictionary<string, Ticket> TicketsToBeClosed = new Dictionary<string, Ticket>();//Reasoning for this Dictionary is that before closing a ticket, it might have to be reviewed|----┙
+
+        private bool validateTicket(Ticket ticket)//returns True if validation successfull
         {
             /*To be Implemented*/
             return true;
@@ -125,6 +141,7 @@ namespace TicketApp
             return 0;
         }
         */
+
 
 
     }
