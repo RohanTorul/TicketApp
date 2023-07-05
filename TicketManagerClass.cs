@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO;
 
 
 namespace TicketApp
@@ -23,22 +24,27 @@ namespace TicketApp
         }
         private enum TICKET_TYPE
         {
-            // To be Implemented...
+            TEST_TYPE1,
+            TEST_TYPE2,
+            TEST_TYPE3,
+            TEST_TYPE4,
+            /*... TEST_TYPEn*/
         }
 
+        private TICKET_TYPE TicketType;
         private STATUS status;
-        public Boolean validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
+        public Boolean Validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)
         {
 
             return true;//To be implemented...
         }
 
-        public Ticket(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)
+        public Ticket(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)
         {
-            if (validator(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter))
+            if (Validator(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter, TicketType_Parameter))
             {
                 TicketCode = TicketCode_Parameter;//-----------------┒
-                TicketDescription = TicketDesctiption_Parameter;//---┡----> Obtained from parsing of eml or some other file.
+                TicketDescription = TicketDesctiption_Parameter;//---┡----> Obtained from parsing of eml... or some other file.
                 EmailOfIssuer = EmailOfIssuer_Parameter;//-----------┘
                 DateTimeTicketCreated = DateTime.Now; //most likely this must not have to be modified, a setter will be implemented anyways
                 DateTimeTicketClosed = DateTime.MinValue;//Must be a known nonesense value by default : 00:00:00.0000000
@@ -125,7 +131,20 @@ namespace TicketApp
 
     internal class EmlFileParser
     {
+        private FileStream EmlHandler;
+        private string path;
 
+        public EmlFileParser(FileStream emlHandler_Parameter, string path_Parameter)
+        {
+            EmlHandler = emlHandler_Parameter;
+            this.path = path_Parameter;
+        }
+
+        public Ticket processFile()
+        {
+            //to be implemented...
+            return null;//TO REMOVE
+        }
     }
 
     public class TicketManager
@@ -171,14 +190,14 @@ namespace TicketApp
         }
         */
 
-        public int addPendingTickets(int ImportanceLevel, string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter)// could use one function for each importance level, but it would lead to too much simmilar code
+        public int addPendingTickets(int ImportanceLevel, string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)// could use one function for each importance level, but it would lead to too much simmilar code
         {
             /*
              Importance Levels: 1- High
                                 2- Normal
                                 3- BelowNormal
              */
-            Ticket TempTicket = new Ticket(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter);
+            Ticket TempTicket = new Ticket(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter, TicketType_Parameter);
             if (TempTicket.getCreation_Success())
             {
                 switch (ImportanceLevel)
@@ -225,16 +244,43 @@ namespace TicketApp
                         ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
                     }
 
-                    amount = PendingRequests.HighImportance_PendingTicketRequests.Count();
+                    amount = PendingRequests.BelowNormalImportance_PendingTicketRequests.Count();
                     for (int i = 0; i < amount; i++)
                     {
-                        TempTicket = PendingRequests.HighImportance_PendingTicketRequests.Dequeue();
+                        TempTicket = PendingRequests.BelowNormalImportance_PendingTicketRequests.Dequeue();
                         ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
                     }
 
                     return 0;
                 }
-
+            }
+            else
+            {
+                if (amount > 0 & ImportanceLevel > 0 & ImportanceLevel < 4)
+                switch (ImportanceLevel)
+                {
+                    case 1:
+                        for (int i = 0; i < amount; i++)
+                        {
+                            TempTicket = PendingRequests.HighImportance_PendingTicketRequests.Dequeue();
+                            ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                        }
+                        return 0;
+                    case 2:
+                        for (int i = 0; i < amount; i++)
+                        {
+                            TempTicket = PendingRequests.NormalImportance_PendingTicketRequests.Dequeue();
+                            ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                        }
+                        return 0;
+                    case 3:
+                        for (int i = 0; i < amount; i++)
+                        {
+                            TempTicket = PendingRequests.BelowNormalImportance_PendingTicketRequests.Dequeue();
+                            ActiveTickets.Add(TempTicket.getTicketCode().GetHashCode().ToString(), TempTicket);
+                        }
+                        return 0;
+                }
             }
             return 0;
         }
