@@ -30,18 +30,25 @@ namespace TicketApp
             TEST_TYPE4,
             /*... TEST_TYPEn*/
         }
+        private enum IMPORTANCE_VALUE
+        {
+            HIGH,
+            NORMAL,
+            BELOW_NORMAL
+        }
 
+        private IMPORTANCE_VALUE ImportanceValue;
         private TICKET_TYPE TicketType;
         private STATUS status;
-        public Boolean Validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)
+        public Boolean Validator(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter, int importanceValue_Parameter)
         {
 
             return true;//To be implemented...
         }
 
-        public Ticket(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)
+        public Ticket(string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter, int importanceValue_Parameter = (int)IMPORTANCE_VALUE.NORMAL)
         {
-            if (Validator(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter, TicketType_Parameter))
+            if (Validator(TicketCode_Parameter, TicketDesctiption_Parameter, EmailOfIssuer_Parameter, TicketType_Parameter, importanceValue_Parameter))
             {
                 TicketCode = TicketCode_Parameter;//-----------------┒
                 TicketDescription = TicketDesctiption_Parameter;//---┡----> Obtained from parsing of eml... or some other file.
@@ -50,13 +57,13 @@ namespace TicketApp
                 DateTimeTicketClosed = DateTime.MinValue;//Must be a known nonesense value by default : 00:00:00.0000000
                 status = STATUS.PENDING; //A ticket is created as Pending by default
                 TicketType = (TICKET_TYPE)TicketType_Parameter;//Dangerous(?)
+                ImportanceValue = (IMPORTANCE_VALUE)importanceValue_Parameter;// I'm not liking casting...
                 Creation_Success = true;
             }
             else
             {
                 Creation_Success = false;
             }
-
         }
         /*
           Setters and Getters for private attibutes.
@@ -142,10 +149,19 @@ namespace TicketApp
 
     }
 
+    //To Be Implemented....
     internal class EmlFileParser
     {
+        /*
         private FileStream EmlHandler;
         private string path;
+
+        private List<FileStream> getEmails(DateTime asOf)
+        {
+            DateTime dateTime = asOf;
+            List<FileStream> TempStream;
+            //Implement Email Fetch and 
+        }
 
         public EmlFileParser(FileStream emlHandler_Parameter, string path_Parameter)
         {
@@ -158,6 +174,7 @@ namespace TicketApp
             //to be implemented...
             return null;//TO REMOVE
         }
+        */
     }
 
     public class TicketManager
@@ -203,7 +220,7 @@ namespace TicketApp
         }
         */
 
-        public int addPendingTickets(int ImportanceLevel, string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter)// could use one function for each importance level, but it would lead to too much simmilar code
+        public int addPendingTickets(int ImportanceLevel, string TicketCode_Parameter, string TicketDesctiption_Parameter, string EmailOfIssuer_Parameter, int TicketType_Parameter, int ImportanceValue )// could use one function for each importance level, but it would lead to too much simmilar code
         {
             /*
              Importance Levels: 1- High
@@ -305,6 +322,12 @@ namespace TicketApp
             return 0;
         }
 
+        /*
+        public int fetchEmails( )
+        {
+
+        }
+        */
 
     }
 }
