@@ -285,5 +285,11 @@ namespace TicketApp
             return 0;
         }
 
+        public int  completeTicket(string TicketCode)
+        {
+            TicketsToBeClosed.Add(TicketCode.GetHashCode().ToString(), ActiveTickets[TicketCode.GetHashCode().ToString()]);//Maybe I should Have used Try... just in case [TO DO]
+            ActiveTickets.Remove(TicketCode.GetHashCode().ToString());
+            return 0;
+        }
     }
 }
