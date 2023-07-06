@@ -49,6 +49,7 @@ namespace TicketApp
                 DateTimeTicketCreated = DateTime.Now; //most likely this must not have to be modified, a setter will be implemented anyways
                 DateTimeTicketClosed = DateTime.MinValue;//Must be a known nonesense value by default : 00:00:00.0000000
                 status = STATUS.PENDING; //A ticket is created as Pending by default
+                TicketType = (TICKET_TYPE)TicketType_Parameter;//Dangerous(?)
                 Creation_Success = true;
             }
             else
@@ -121,11 +122,23 @@ namespace TicketApp
         {
             return DateTimeTicketClosed.ToString();
         }
+        //---------------------------------------------------------------------------------------[TicketType
+        public int setTicketType(int TypeNumber)//just in case...
+        {
+            TicketType = (TICKET_TYPE)TypeNumber;
+            return 0;
+        }
+        public string getTicketType()
+        {
+            return TicketType.ToString();
+        }
+
         //---------------------------------------------------------------------------------------[Creation_Success
         public bool getCreation_Success()
         {
             return Creation_Success;
         }
+
 
     }
 
@@ -291,5 +304,7 @@ namespace TicketApp
             ActiveTickets.Remove(TicketCode.GetHashCode().ToString());
             return 0;
         }
+
+
     }
 }
